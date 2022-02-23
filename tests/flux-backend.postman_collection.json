@@ -1,0 +1,1795 @@
+{
+  "info": {
+    "_postman_id": "733e3e8e-3981-4523-ba1b-e2c9835492ee",
+    "name": "flux-backend",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "data preparation",
+      "item": [
+        {
+          "name": "auth",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var response_json = pm.response.json();\r",
+                  "var token = response_json.access_token;\r",
+                  "pm.environment.set('token', token);\r",
+                  "\r",
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "name": "Content-Type",
+                "type": "text",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "username",
+                  "value": "{{username}}",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "{{password}}",
+                  "type": "text"
+                },
+                {
+                  "key": "client_id",
+                  "value": "{{clientId}}",
+                  "type": "text"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "password",
+                  "type": "text"
+                },
+                {
+                  "key": "client_secret",
+                  "value": "{{clientSecret}}",
+                  "type": "text"
+                },
+                {
+                  "key": "scope",
+                  "value": "{{scope}}",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "https://auth.youwol.com/auth/realms/youwol/protocol/openid-connect/token",
+              "protocol": "https",
+              "host": [
+                "auth",
+                "youwol",
+                "com"
+              ],
+              "path": [
+                "auth",
+                "realms",
+                "youwol",
+                "protocol",
+                "openid-connect",
+                "token"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "userinfo",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"member of /youwol-users/postman-tester/\", function () {",
+                  "    resp = pm.response.json()",
+                  "    pm.expect(resp.memberof.filter( group => group.includes(\"/youwol-users/postman-tester/\")).length).to.be.above(0)",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "",
+                "type": "text",
+                "value": "",
+                "disabled": true
+              },
+              {
+                "key": "",
+                "type": "text",
+                "value": "",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "https://auth.youwol.com/auth/realms/youwol/protocol/openid-connect/userinfo",
+              "protocol": "https",
+              "host": [
+                "auth",
+                "youwol",
+                "com"
+              ],
+              "path": [
+                "auth",
+                "realms",
+                "youwol",
+                "protocol",
+                "openid-connect",
+                "userinfo"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "healthz",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/api/flux-backend/healthz",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "flux-backend",
+                "healthz"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "clear namespace postman-flux",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "type": "text",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{cdn-host}}/api/cdn-backend/namespace/postman-flux",
+              "host": [
+                "{{cdn-host}}"
+              ],
+              "path": [
+                "api",
+                "cdn-backend",
+                "namespace",
+                "postman-flux"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "sync CDN",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"24 files, 6 libraries\", function () {",
+                  "    resp = pm.response.json()",
+                  "    pm.expect(resp.filesCount).to.equal(13)",
+                  "    pm.expect(resp.librariesCount).to.equal(5)",
+                  "});",
+                  "",
+                  "",
+                  ""
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "type": "text",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "services/flux-backend/tests/test-data/cdn.zip"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{cdn-host}}/api/cdn-backend/actions/sync",
+              "host": [
+                "{{cdn-host}}"
+              ],
+              "path": [
+                "api",
+                "cdn-backend",
+                "actions",
+                "sync"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "sanity checks",
+      "item": [
+        {
+          "name": "get libraries",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"3 libraries\", function () {",
+                  "    resp = pm.response.json()",
+                  "    pm.expect(resp.libraries.length).to.equal(3)",
+                  "});",
+                  "",
+                  "pm.test(\"@youwol/flux-lib-core\", function () {",
+                  "    resp = pm.response.json()",
+                  "    target = [\"0.0.0\", \"0.0.1\"]",
+                  "    pm.expect(resp.libraries[0].name).to.equal(\"@postman-flux/flux-core\")",
+                  "    pm.expect(resp.libraries[0].versions).to.deep.equal(target)",
+                  "    pm.expect(resp.libraries[0].namespace).to.equal(\"postman-flux\")",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "type": "text",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{cdn-host}}/api/cdn-backend/queries/libraries?namespace=postman-flux",
+              "host": [
+                "{{cdn-host}}"
+              ],
+              "path": [
+                "api",
+                "cdn-backend",
+                "queries",
+                "libraries"
+              ],
+              "query": [
+                {
+                  "key": "namespace",
+                  "value": "postman-flux"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "list projects",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"no project\", function () {",
+                  "    let respJson= pm.response.json()",
+                  "    pm.expect(respJson).to.have.property(\"projects\")",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "description": "bearer token",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/api/flux-backend/projects",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "flux-backend",
+                "projects"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "empty project",
+      "item": [
+        {
+          "name": "user info",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"user has 'private' and '/youwol-users/postman-tester' groups\", function () {",
+                  "    let respJson= pm.response.json()",
+                  "    pm.expect(respJson).to.have.property('name');",
+                  "    pm.expect(respJson).to.have.property('groups');",
+                  "    pm.expect(respJson.groups.filter( p => p.path==\"private\").length).to.equal(1)",
+                  "    pm.expect(respJson.groups.filter( p => p.path==\"/youwol-users/postman-tester\").length).to.equal(1)",
+                  "",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "description": "bearer token",
+                "key": "Authorization",
+                "type": "text",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/api/flux-backend/user-info",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "flux-backend",
+                "user-info"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "new project",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"A projectId is returned\", function () {",
+                  "    let respJson= pm.response.json()",
+                  "    pm.expect(respJson).to.have.property('projectId');",
+                  "    pm.environment.set(\"projectId\",respJson.projectId)",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "name": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "description": "bearer token",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n\t\"name\": \"test-tricot\",\n\t\"description\" : \"some description\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{host}}/api/flux-backend/projects/create",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "flux-backend",
+                "projects",
+                "create"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "list projects",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Project list contains created project\", function () {",
+                  "    let respJson= pm.response.json()",
+                  "    pm.expect(respJson).to.have.property('projects');",
+                  "    project= respJson.projects.find( p => p.id == pm.environment.get(\"projectId\"))",
+                  "",
+                  "    pm.expect(project == undefined ).to.be.false;",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "description": "bearer token",
+                "key": "Authorization",
+                "type": "text",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/api/flux-backend/projects",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "flux-backend",
+                "projects"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get metadata",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Metadata are returned\", function () {",
+                  "    let respJson= pm.response.json()",
+                  "    pm.expect(respJson).to.have.property('id');",
+                  "    pm.expect(respJson).to.have.property('name');",
+                  "    pm.expect(respJson).to.have.property('fluxPacks');",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "name": "Content-Type",
+                "type": "text",
+                "value": "application/json"
+              },
+              {
+                "description": "bearer token",
+                "key": "Authorization",
+                "type": "text",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n\t\"name\": \"test-tricot-updated\",\n\t\"description\" : \"some description updated\",\n\t\"scope\": \"/youwol-users/postman-tester\",\n\t\"fluxPacks\":  [ \"@postmanFluxBackend/flux-pack-dataframe\"],\n\t\"libraries\": {\n        \"@postmanFluxBackend/flux-pack-dataframe\": \"0.0.2\",\n        \"lodash\": \"4.17.15\",\n        \"@postmanFluxBackend/flux-lib-core\": \"1.1.4-next\",\n        \"reflect-metadata\": \"0.1.13\",\n        \"tslib\": \"1.10.0\",\n        \"rxjs\": \"6.5.5\"\n        }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{host}}/api/flux-backend/projects/{{projectId}}/metadata",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "flux-backend",
+                "projects",
+                "{{projectId}}",
+                "metadata"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get project",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"A project is returned\", function () {",
+                  "    let respJson = pm.response.json()",
+                  "    pm.expect(respJson).to.have.property('name');",
+                  "    pm.expect(respJson).to.have.property('description');",
+                  "    pm.expect(respJson).to.have.property('requirements');",
+                  "    pm.expect(respJson).to.have.property('workflow');",
+                  "    pm.expect(respJson).to.have.property('builderRendering');",
+                  "    pm.expect(respJson).to.have.property('runnerRendering');",
+                  "",
+                  "    pm.expect(respJson.name).to.equal('test-tricot');",
+                  "    pm.expect(respJson.description).to.equal('some description');",
+                  "    pm.expect(respJson.requirements).to.have.property('fluxPacks');",
+                  "    pm.expect(respJson.requirements.fluxPacks).to.deep.equal([]);",
+                  "",
+                  "    pm.expect(respJson.requirements).to.have.property('libraries');",
+                  "",
+                  "    pm.expect(respJson.requirements.libraries).to.deep.equal({});",
+                  "",
+                  "    pm.expect(respJson.requirements).to.have.property('loadingGraph');",
+                  "    pm.expect(respJson.requirements.loadingGraph).to.have.property('lock');",
+                  "",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/api/flux-backend/projects/{{projectId}}",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "flux-backend",
+                "projects",
+                "{{projectId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "udate metadata",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "name": "Content-Type",
+                "type": "text",
+                "value": "application/json"
+              },
+              {
+                "description": "bearer token",
+                "key": "Authorization",
+                "type": "text",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n\t\"name\": \"test-tricot-updated\",\n\t\"description\" : \"some description updated\",\n\t\"libraries\": {\n        \"@postman-flux/flux-dataframe\": \"0.0.1\",\n        \"lodash\": \"4.17.15\",\n        \"@postman-flux/flux-core\": \"0.0.1\",\n        \"reflect-metadata\": \"0.1.13\",\n        \"tslib\": \"1.10.0\",\n        \"rxjs\": \"6.5.5\"\n        }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{host}}/api/flux-backend/projects/{{projectId}}/metadata",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "flux-backend",
+                "projects",
+                "{{projectId}}",
+                "metadata"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get project updated",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"A project is returned\", function () {",
+                  "    let respJson = pm.response.json()",
+                  "",
+                  "    pm.expect(respJson.name).to.equal('test-tricot-updated');",
+                  "    pm.expect(respJson.description).to.equal('some description updated');",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "type": "text",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/api/flux-backend/projects/{{projectId}}",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "flux-backend",
+                "projects",
+                "{{projectId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "list projects",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Project list contains created project\", function () {",
+                  "    let respJson= pm.response.json()",
+                  "    pm.expect(respJson).to.have.property('projects');",
+                  "    project= respJson.projects.find( p => p.id == pm.environment.get(\"projectId\"))",
+                  "    pm.expect(project == undefined ).to.be.false;",
+                  "    pm.expect(project.name).to.equal(\"test-tricot-updated\");",
+                  "    pm.expect(project.description).to.equal(\"some description updated\");",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "description": "bearer token",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/api/flux-backend/projects",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "flux-backend",
+                "projects"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get records",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"ensure record\", function () {",
+                  "    jsonResp = pm.response.json()",
+                  "    pm.expect(jsonResp).to.have.property(\"docdb\")",
+                  "    pm.expect(jsonResp).to.have.property(\"storage\")",
+                  "",
+                  "    pm.expect(jsonResp.docdb).to.have.property(\"keyspaces\")",
+                  "    keyspace = jsonResp.docdb.keyspaces[0]",
+                  "    pm.expect(keyspace).to.have.property(\"groupId\")",
+                  "",
+                  "    pm.expect(keyspace).to.have.property(\"tables\")",
+                  "    table = keyspace.tables[0]",
+                  "    pm.expect(table).to.have.property(\"values\")",
+                  "",
+                  "    pm.expect(jsonResp.storage.buckets[0].paths.length).to.eq(5)",
+                  "    pm.expect(jsonResp.storage.buckets[0]).to.have.property(\"groupId\")",
+                  "",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "description": "bearer token",
+                "key": "Authorization",
+                "type": "text",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"ids\":[\"{{projectId}}\"],\n    \"groupId\": \"L3lvdXdvbC11c2Vycy9wb3N0bWFuLXRlc3Rlci9zdWJjaGlsZHRlc3Qx\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{host}}/api/flux-backend/records",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "flux-backend",
+                "records"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "duplicate project",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"A projectId and libraries are returned\", function () {",
+                  "    let respJson= pm.response.json()",
+                  "    pm.expect(respJson).to.have.property('projectId');",
+                  "    pm.environment.set(\"projectId_2\",respJson.projectId)",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "name": "Content-Type",
+                "type": "text",
+                "value": "application/json"
+              },
+              {
+                "description": "bearer token",
+                "key": "Authorization",
+                "type": "text",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{host}}/api/flux-backend/projects/{{projectId}}/duplicate",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "flux-backend",
+                "projects",
+                "{{projectId}}",
+                "duplicate"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get project duplicated",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"A project is returned\", function () {",
+                  "    let respJson = pm.response.json()",
+                  "",
+                  "    pm.expect(respJson.name).to.equal('test-tricot-updated');",
+                  "    pm.expect(respJson.description).to.equal('some description updated');",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "type": "text",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/api/flux-backend/projects/{{projectId_2}}",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "flux-backend",
+                "projects",
+                "{{projectId_2}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "update project",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "name": "Content-Type",
+                "type": "text",
+                "value": "application/json"
+              },
+              {
+                "description": "bearer token",
+                "key": "Authorization",
+                "type": "text",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"test-tricot\",\n    \"description\": \"some description\",\n    \"requirements\": {\n        \"fluxPacks\": [\n            \"@postman-flux/flux-dataframe\"\n        ],\n        \"libraries\": {\n            \"@postman-flux/flux-dataframe\": \"0.0.1\",\n            \"@postman-flux/flux-core\": \"0.0.1\",\n            \"tslib\": \"1.10.0\",\n            \"lodash\": \"4.17.15\",\n            \"reflect-metadata\": \"0.1.13\",\n            \"rxjs\": \"6.5.5\"\n        },\n        \"loadingGraph\": {\n            \"graphType\": \"sequential-v1\",\n            \"lock\": [\n                {\n                    \"name\": \"@postman-flux/flux-dataframe\",\n                    \"version\": \"0.0.1\",\n                    \"id\": \"QHBvc3RtYW5GbHV4QmFja2VuZC9mbHV4LXBhY2stZGF0YWZyYW1l\"\n                },\n                {\n                    \"name\": \"lodash\",\n                    \"version\": \"4.17.15\",\n                    \"id\": \"bG9kYXNo\"\n                },\n                {\n                    \"name\": \"postman-flux/flux-core\",\n                    \"version\": \"0.0.1\",\n                    \"id\": \"QHBvc3RtYW5GbHV4QmFja2VuZC9mbHV4LWxpYi1jb3Jl\"\n                },\n                {\n                    \"name\": \"reflect-metadata\",\n                    \"version\": \"0.1.13\",\n                    \"id\": \"cmVmbGVjdC1tZXRhZGF0YQ==\"\n                },\n                {\n                    \"name\": \"tslib\",\n                    \"version\": \"1.10.0\",\n                    \"id\": \"dHNsaWI=\"\n                },\n                {\n                    \"name\": \"rxjs\",\n                    \"version\": \"6.5.5\",\n                    \"id\": \"cnhqcw==\"\n                }\n            ],\n            \"definition\": [\n                [\n                    [\n                        \"bG9kYXNo\",\n                        \"bG9kYXNo/4.17.15/lodash.min.js\"\n                    ],\n                    [\n                        \"cmVmbGVjdC1tZXRhZGF0YQ==\",\n                        \"cmVmbGVjdC1tZXRhZGF0YQ==/0.1.13/reflect-metadata.min.js\"\n                    ],\n                    [\n                        \"dHNsaWI=\",\n                        \"dHNsaWI=/1.10.0/tslib.min.js\"\n                    ],\n                    [\n                        \"cnhqcw==\",\n                        \"cnhqcw==/6.5.5/rxjs.umd.min.js\"\n                    ]\n                ],\n                [\n                    [\n                        \"QHBvc3RtYW5GbHV4QmFja2VuZC9mbHV4LWxpYi1jb3Jl\",\n                        \"QHBvc3RtYW5GbHV4QmFja2VuZC9mbHV4LWxpYi1jb3Jl/0.0.1/flux-core.umd.js\"\n                    ]\n                ],\n                [\n                    [\n                        \"QHBvc3RtYW5GbHV4QmFja2VuZC9mbHV4LXBhY2stZGF0YWZyYW1l\",\n                        \"QHBvc3RtYW5GbHV4QmFja2VuZC9mbHV4LXBhY2stZGF0YWZyYW1l/0.0.1/flux-dataframe.umd.js\"\n                    ]\n                ]\n            ]\n        }\n    },\n    \"workflow\": {\n        \"rootLayerTree\": {\n            \"layerId\": \"rootLayer\",\n            \"title\": \"rootLayer\",\n            \"children\": [],\n            \"moduleIds\": [],\n            \"inputSlots\": [],\n            \"outputSlots\": []\n        },\n        \"modules\": [],\n        \"connections\": [],\n        \"plugins\": []\n    },\n    \"builderRendering\": {\n        \"modulesView\": [],\n        \"connectionsView\": [],\n        \"descriptionsBoxes\": []\n    },\n    \"runnerRendering\": {\n        \"layout\": \"<div/>\",\n        \"style\": \"\"\n    }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{host}}/api/flux-backend/projects/{{projectId_2}}",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "flux-backend",
+                "projects",
+                "{{projectId_2}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get project updated",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"A project is returned\", function () {",
+                  "    let respJson = pm.response.json()",
+                  "",
+                  "    pm.expect(respJson.name).to.equal('test-tricot');",
+                  "    pm.expect(respJson.description).to.equal('some description');",
+                  "    pm.expect(respJson.runnerRendering.layout).to.equal('<div/>');",
+                  "    pm.expect(respJson.requirements.libraries['@postman-flux/flux-dataframe']).to.equal('0.0.1');",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "type": "text",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/api/flux-backend/projects/{{projectId_2}}",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "flux-backend",
+                "projects",
+                "{{projectId_2}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "udate metadata",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "name": "Content-Type",
+                "type": "text",
+                "value": "application/json"
+              },
+              {
+                "description": "bearer token",
+                "key": "Authorization",
+                "type": "text",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n\t\"name\": \"test-tricot-updated\",\n\t\"description\" : \"some description updated\",\n\t\"libraries\": {\n        \"@postman-flux/flux-dataframe\": \"0.0.1\",\n        \"lodash\": \"4.17.15\",\n        \"@postman-flux/flux-core\": \"0.0.1\",\n        \"reflect-metadata\": \"0.1.13\",\n        \"tslib\": \"1.10.0\",\n        \"rxjs\": \"6.5.5\"\n        }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{host}}/api/flux-backend/projects/{{projectId_2}}/metadata",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "flux-backend",
+                "projects",
+                "{{projectId_2}}",
+                "metadata"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get project updated",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"The project is returned with empty requirements (no module in the project)\", function () {",
+                  "    let respJson = pm.response.json()",
+                  "",
+                  "    pm.expect(respJson.name).to.equal('test-tricot-updated');",
+                  "    pm.expect(respJson.description).to.equal('some description updated');",
+                  "    pm.expect(respJson.runnerRendering.layout).to.equal('<div/>');",
+                  "    pm.expect(respJson.requirements.libraries).to.deep.equal({});",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "type": "text",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/api/flux-backend/projects/{{projectId_2}}",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "flux-backend",
+                "projects",
+                "{{projectId_2}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "list projects",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Project list contains created project\", function () {",
+                  "    let respJson= pm.response.json()",
+                  "    pm.expect(respJson).to.have.property('projects');",
+                  "    project= respJson.projects.find( p => p.id == pm.environment.get(\"projectId_2\"))",
+                  "    pm.expect(project == undefined ).to.be.false;",
+                  "    pm.expect(project.name).to.equal(\"test-tricot-updated\");",
+                  "    pm.expect(project.description).to.equal(\"some description updated\");",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "description": "bearer token",
+                "key": "Authorization",
+                "type": "text",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/api/flux-backend/projects",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "flux-backend",
+                "projects"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get records",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"ensure record\", function () {",
+                  "    jsonResp = pm.response.json()",
+                  "    pm.expect(jsonResp).to.have.property(\"docdb\")",
+                  "    pm.expect(jsonResp).to.have.property(\"storage\")",
+                  "",
+                  "    pm.expect(jsonResp.docdb).to.have.property(\"keyspaces\")",
+                  "    keyspace = jsonResp.docdb.keyspaces[0]",
+                  "    pm.expect(keyspace).to.have.property(\"groupId\")",
+                  "",
+                  "    pm.expect(keyspace).to.have.property(\"tables\")",
+                  "    table = keyspace.tables[0]",
+                  "    pm.expect(table).to.have.property(\"values\")",
+                  "",
+                  "    pm.expect(jsonResp.storage.buckets[0].paths.length).to.eq(5)",
+                  "    pm.expect(jsonResp.storage.buckets[0]).to.have.property(\"groupId\")",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "description": "bearer token",
+                "key": "Authorization",
+                "type": "text",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"ids\":[\"{{projectId_2}}\"],\n    \"groupId\": \"private_82bcba26-65d7-4072-afc4-a28bb58611c4\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{host}}/api/flux-backend/records",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "flux-backend",
+                "records"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "delete project",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Deletion confirmation\", function () {",
+                  "    let respJson= pm.response.json()",
+                  "    pm.expect(respJson).to.have.property('status');",
+                  "    pm.expect(respJson).to.have.property('projectId');",
+                  "    pm.expect(respJson.projectId).to.equal(pm.environment.get('projectId'));",
+                  "    ",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "description": "bearer token",
+                "key": "Authorization",
+                "type": "text",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/api/flux-backend/projects/{{projectId}}",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "flux-backend",
+                "projects",
+                "{{projectId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "delete project duplicated",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Deletion confirmation\", function () {",
+                  "    let respJson= pm.response.json()",
+                  "    pm.expect(respJson).to.have.property('status');",
+                  "    pm.expect(respJson).to.have.property('projectId');",
+                  "    pm.expect(respJson.projectId).to.equal(pm.environment.get('projectId_2'));",
+                  "    ",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "description": "bearer token",
+                "key": "Authorization",
+                "type": "text",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/api/flux-backend/projects/{{projectId_2}}",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "flux-backend",
+                "projects",
+                "{{projectId_2}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "project with module",
+      "item": [
+        {
+          "name": "new project",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"A projectId is returned\", function () {",
+                  "    let respJson= pm.response.json()",
+                  "    pm.expect(respJson).to.have.property('projectId');",
+                  "    pm.environment.set(\"flux-backend#project-with-module#projectId\",respJson.projectId)",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "name": "Content-Type",
+                "type": "text",
+                "value": "application/json"
+              },
+              {
+                "description": "bearer token",
+                "key": "Authorization",
+                "type": "text",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n\t\"name\": \"test-tricot\",\n\t\"description\" : \"some description\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{host}}/api/flux-backend/projects/create",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "flux-backend",
+                "projects",
+                "create"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "update project",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "name": "Content-Type",
+                "type": "text",
+                "value": "application/json"
+              },
+              {
+                "description": "bearer token",
+                "key": "Authorization",
+                "type": "text",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"test-tricot\",\n    \"description\": \"some description\",\n    \"requirements\": {\n        \"fluxPacks\": [\n            \"@postman-flux/flux-dataframe\"\n        ],\n        \"libraries\": {\n            \"@postman-flux/flux-dataframe\": \"0.0.1\",\n            \"@postman-flux/flux-core\": \"0.0.0\",\n            \"tslib\": \"1.10.0\",\n            \"lodash\": \"4.17.15\",\n            \"reflect-metadata\": \"0.1.13\",\n            \"rxjs\": \"6.5.5\"\n        },\n        \"loadingGraph\": {\n            \"graphType\": \"sequential-v1\",\n            \"lock\": [\n                {\n                    \"name\": \"@postman-flux/flux-dataframe\",\n                    \"version\": \"0.0.1\",\n                    \"id\": \"QHBvc3RtYW5GbHV4QmFja2VuZC9mbHV4LXBhY2stZGF0YWZyYW1l\"\n                },\n                {\n                    \"name\": \"lodash\",\n                    \"version\": \"4.17.15\",\n                    \"id\": \"bG9kYXNo\"\n                },\n                {\n                    \"name\": \"@postman-flux/flux-core\",\n                    \"version\": \"0.0.0\",\n                    \"id\": \"QHBvc3RtYW5GbHV4QmFja2VuZC9mbHV4LWxpYi1jb3Jl\"\n                },\n                {\n                    \"name\": \"reflect-metadata\",\n                    \"version\": \"0.1.13\",\n                    \"id\": \"cmVmbGVjdC1tZXRhZGF0YQ==\"\n                },\n                {\n                    \"name\": \"tslib\",\n                    \"version\": \"1.10.0\",\n                    \"id\": \"dHNsaWI=\"\n                },\n                {\n                    \"name\": \"rxjs\",\n                    \"version\": \"6.5.5\",\n                    \"id\": \"cnhqcw==\"\n                }\n            ],\n            \"definition\": [\n                [\n                    [\n                        \"bG9kYXNo\",\n                        \"bG9kYXNo/4.17.15/lodash.min.js\"\n                    ],\n                    [\n                        \"cmVmbGVjdC1tZXRhZGF0YQ==\",\n                        \"cmVmbGVjdC1tZXRhZGF0YQ==/0.1.13/reflect-metadata.min.js\"\n                    ],\n                    [\n                        \"dHNsaWI=\",\n                        \"dHNsaWI=/1.10.0/tslib.min.js\"\n                    ],\n                    [\n                        \"cnhqcw==\",\n                        \"cnhqcw==/6.5.5/rxjs.umd.min.js\"\n                    ]\n                ],\n                [\n                    [\n                        \"QHBvc3RtYW5GbHV4QmFja2VuZC9mbHV4LWxpYi1jb3Jl\",\n                        \"QHBvc3RtYW5GbHV4QmFja2VuZC9mbHV4LWxpYi1jb3Jl/0.0.0/flux-core.umd.js\"\n                    ]\n                ],\n                [\n                    [\n                        \"QHBvc3RtYW5GbHV4QmFja2VuZC9mbHV4LXBhY2stZGF0YWZyYW1l\",\n                        \"QHBvc3RtYW5GbHV4QmFja2VuZC9mbHV4LXBhY2stZGF0YWZyYW1l/0.0.1/flux-dataframe.umd.js\"\n                    ]\n                ]\n            ]\n        }\n    },\n    \"workflow\": {\n        \"rootLayerTree\": {\n            \"layerId\": \"rootLayer\",\n            \"title\": \"rootLayer\",\n            \"children\": [],\n            \"moduleIds\": [],\n            \"inputSlots\": [],\n            \"outputSlots\": []\n        },\n        \"modules\": [\n            {\"configuration\": {},\n            \"moduleId\": \"module_instance\",\n            \"factoryId\": { \"module\":\"module\", \"pack\":\"@postman-flux/flux-dataframe\"}\n            }\n        ],\n        \"connections\": [],\n        \"plugins\": []\n    },\n    \"builderRendering\": {\n        \"modulesView\": [],\n        \"connectionsView\": [],\n        \"descriptionsBoxes\": []\n    },\n    \"runnerRendering\": {\n        \"layout\": \"<div/>\",\n        \"style\": \"\"\n    }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{host}}/api/flux-backend/projects/{{flux-backend#project-with-module#projectId}}",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "flux-backend",
+                "projects",
+                "{{flux-backend#project-with-module#projectId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "udate metadata",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "name": "Content-Type",
+                "type": "text",
+                "value": "application/json"
+              },
+              {
+                "description": "bearer token",
+                "key": "Authorization",
+                "type": "text",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n\t\"name\": \"test-tricot-updated\",\n\t\"description\" : \"some description updated\",\n\t\"libraries\": {\n        \"@postman-flux/flux-dataframe\": \"0.0.1\",\n        \"lodash\": \"4.17.15\",\n        \"@postman-flux/flux-core\": \"0.0.1\",\n        \"reflect-metadata\": \"0.1.13\",\n        \"tslib\": \"1.10.0\",\n        \"rxjs\": \"6.5.5\"\n        }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{host}}/api/flux-backend/projects/{{flux-backend#project-with-module#projectId}}/metadata",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "flux-backend",
+                "projects",
+                "{{flux-backend#project-with-module#projectId}}",
+                "metadata"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get project updated",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"The project is returned with filled requirements\", function () {",
+                  "    let respJson = pm.response.json()",
+                  "",
+                  "    pm.expect(respJson.name).to.equal('test-tricot-updated');",
+                  "    pm.expect(respJson.description).to.equal('some description updated');",
+                  "    pm.expect(respJson.runnerRendering.layout).to.equal('<div/>');",
+                  "    pm.expect(respJson.requirements.libraries).to.deep.equal({",
+                  "            \"@postman-flux/flux-dataframe\": \"0.0.1\",",
+                  "            \"rxjs\": \"6.5.5\",",
+                  "            \"reflect-metadata\": \"0.1.13\",",
+                  "            \"@postman-flux/flux-core\": \"0.0.1\",",
+                  "            \"lodash\": \"4.17.15\",",
+                  "            \"tslib\": \"1.10.0\"",
+                  "        });",
+                  "    pm.expect(respJson.requirements.loadingGraph.lock.length).to.equal(6);",
+                  "    pm.expect(respJson.requirements.loadingGraph.definition.length).to.equal(3);",
+                  "    pm.expect(respJson.workflow.modules[0].factoryId).to.deep.equal({",
+                  "            \"module\": \"module\",",
+                  "            \"pack\": \"@postman-flux/flux-dataframe\"",
+                  "        });",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "type": "text",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/api/flux-backend/projects/{{flux-backend#project-with-module#projectId}}",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "flux-backend",
+                "projects",
+                "{{flux-backend#project-with-module#projectId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "delete project",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Deletion confirmation\", function () {",
+                  "    let respJson= pm.response.json()",
+                  "    pm.expect(respJson).to.have.property('status');",
+                  "    pm.expect(respJson).to.have.property('projectId');",
+                  "    pm.expect(respJson.projectId).to.equal(pm.environment.get('flux-backend#project-with-module#projectId'));",
+                  "    ",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "description": "bearer token",
+                "key": "Authorization",
+                "type": "text",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/api/flux-backend/projects/{{flux-backend#project-with-module#projectId}}",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "flux-backend",
+                "projects",
+                "{{flux-backend#project-with-module#projectId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "clear namespace postman-flux",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              ""
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "type": "text",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{cdn-host}}/api/cdn-backend/namespace/postman-flux",
+          "host": [
+            "{{cdn-host}}"
+          ],
+          "path": [
+            "api",
+            "cdn-backend",
+            "namespace",
+            "postman-flux"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
